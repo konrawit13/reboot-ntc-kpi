@@ -1,0 +1,12 @@
+{  "data": [{"DT_RowId": "1","level": 0,"key": "1","parent": 0,"name": "Adam","value": 154},
+			{"DT_RowId": "2","level": 1,"key": "2","parent": 1,"name": "Nelenil Adam","value": 55},
+			{"DT_RowId": "3","level": 0,"key": "3","parent": 0,"name": "Ivan","value": 112},
+			{"DT_RowId": "4","level": 1,"key": "4","parent": 1,"name": "Skakal Adam","value": 99},
+			{"DT_RowId": "5","level": 1,"key": "5","parent": 3,"name": "Nelenil Ivan","value": 112},
+			{"DT_RowId": "6","level": 0,"key": "6","parent": 0,"name": "Karol","value": 154},
+            {"DT_RowId": "7","level": 1,"key": "7","parent": 6,"name": "Hufnagel Karol","value": 80},
+            {"DT_RowId": "8","level": 1,"key": "8","parent": 6,"name": "Sipeky Karol","value": 74},
+            {"DT_RowId": "9","level": 2,"key": "9","parent": 4,"name": "Skakal *st* Adam","value": 40},
+            {"DT_RowId": "10","level": 2,"key": "10","parent": 4,"name": "Skakal *ml* Adam","value": 59}
+        ]
+}
