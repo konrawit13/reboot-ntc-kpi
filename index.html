@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tree Table</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+            font-weight: bold;
+        }
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+        .toggle {
+            cursor: pointer;
+            user-select: none;
+            margin-right: 8px;
+            font-weight: bold;
+        }
+        .nested {
+            display: none;
+            padding-left: 20px;
+        }
+        .nested.show {
+            display: table-row;
+        }
+    </style>
+</head>
+<body>
+    <h1>Hierarchy Tree Table</h1>
+    <table id="treeTable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+        </tbody>
+    </table>
+
+    <script>
+        async function loadHierarchy() {
+            try {
+                const response = await fetch('hierarchy.json');
+                const data = await response.json();
+                renderTree(data);
+            } catch (error) {
+                console.error('Error loading hierarchy:', error);
+            }
+        }
+
+        function renderTree(data, level = 0) {
+            const tbody = document.getElementById('tableBody');
+            
+            function addRow(item, depth) {
+                const row = document.createElement('tr');
+                const hasChildren = item.children && item.children.length > 0;
+                const indent = '&nbsp;'.repeat(depth * 2);
+                
+                row.innerHTML = `
+                    <td>${indent}${hasChildren ? '<span class="toggle" onclick="toggleRow(event)">▶</span>' : ''} ${item.name}</td>
+                    <td>${item.value || ''}</td>
+                `;
+                
+                tbody.appendChild(row);
+                
+                if (hasChildren) {
+                    item.children.forEach(child => addRow(child, depth + 1));
+                }
+            }
+            
+            if (Array.isArray(data)) {
+                data.forEach(item => addRow(item, 0));
+            } else {
+                addRow(data, 0);
+            }
+        }
+
+        function toggleRow(event) {
+            event.stopPropagation();
+            const toggle = event.target;
+            toggle.textContent = toggle.textContent === '▶' ? '▼' : '▶';
+        }
+
+        loadHierarchy();
+    </script>
+</body>
+</html>
