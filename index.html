@@ -11,22 +11,31 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>ผลการปฏิบัติการกองควบคุมวัตถุเสพติด</h1>
-    <div class="d-flex gap-2 align-items-center" style="margin-bottom:12px">
-        <button id="expandAllBtn" class="btn btn-sm btn-outline-primary" onclick="expandAll()">Expand all</button>
-        <button id="collapseAllBtn" class="btn btn-sm btn-outline-primary" onclick="collapseAll()">Collapse all</button>
-        <button id="editBtn" class="btn btn-sm btn-primary" disabled onclick="openEdit()">Edit</button>
+    <div class="container">
+        <div class="row">
+            <p>
+                <span class="title">ผลการปฏิบัติการกองควบคุมวัตถุเสพติด</span><span class="title-year">ปีงบ 2569</span><span class="group">Pre-marketing</span>
+            </p>
+            
+        </div>
+       <div class="row">
+            <div class="d-flex gap-2 align-items-center" style="margin-bottom:12px">
+                <button id="expandAllBtn" class="btn btn-sm btn-outline-primary">Expand all</button>
+                <button id="collapseAllBtn" class="btn btn-sm btn-outline-primary">Collapse all</button>
+                <button id="editBtn" class="btn btn-sm btn-primary" disabled>Edit</button>
+            </div>
+       </div>
+        <table id="treeTable">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Value</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+            </tbody>
+        </table>        
     </div>
-    <table id="treeTable">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Value</th>
-            </tr>
-        </thead>
-        <tbody id="tableBody">
-        </tbody>
-    </table>
 
     <!-- Edit Modal -->
     <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">

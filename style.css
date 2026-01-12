@@ -58,3 +58,31 @@ tr[data-parent] .nested-cell::before {
     display: inline-block;
     width: 16px;
 }
+
+.title {
+    font-weight: bold;
+    color: black;
+    font-size: 40px;
+}
+
+.title-year {
+    color: rgb(113, 113, 113);
+    padding-left: 10px;
+    padding-bottom: 2px;
+    font-size: 28px;
+}
+
+.title-year::before {
+    content: "|";
+    margin-right: 5px;
+}
+
+.group {
+    color: rgb(59, 59, 59);
+    font-size: 28px;
+    background-color: rgb(255, 203, 33);
+    border-radius: 10px;
+    padding-left: 15px;
+    padding-right: 15px;
+    margin-left: 5px;
+}
