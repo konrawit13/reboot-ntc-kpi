@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tree Table</title>
+    <title>KPI-Narcotics</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
 
@@ -27,229 +28,39 @@
         </tbody>
     </table>
 
-        <!-- Edit Modal -->
-        <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="editModalLabel">Edit Row</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="editForm">
-                            <div class="mb-3">
-                                <label for="editName" class="form-label">Name</label>
-                                <input type="text" class="form-control" id="editName">
-                            </div>
-                            <div class="mb-3">
-                                <label for="editValue" class="form-label">Value</label>
-                                <input type="text" class="form-control" id="editValue">
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" id="saveEditBtn" class="btn btn-primary">Save</button>
-                    </div>
+    <!-- Edit Modal -->
+    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">Edit Row</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editForm">
+                        <div class="mb-3">
+                            <label for="editName" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="editName">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editValue" class="form-label">Value</label>
+                            <input type="text" class="form-control" id="editValue">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" id="saveEditBtn" class="btn btn-primary">Save</button>
                 </div>
             </div>
         </div>
+    </div>
 
-    <script>
-        async function loadHierarchy() {
-            try {
-                const response = await fetch('hierarchy.json');
-                const payload = await response.json();
-                // Handle either a raw array or a wrapped object { data: [...] }
-                const data = Array.isArray(payload) ? payload : (payload && payload.data) ? payload.data : payload;
-                renderTree(data);
-            } catch (error) {
-                console.error('Error loading hierarchy:', error);
-            }
-        }
-
-        function buildTree(flat) {
-            // Build map of nodes
-            const nodes = {};
-            flat.forEach(item => {
-                const key = String(item.key != null ? item.key : item.DT_RowId);
-                nodes[key] = Object.assign({}, item, { key, children: [] });
-            });
-
-            const roots = [];
-            flat.forEach(item => {
-                const key = String(item.key != null ? item.key : item.DT_RowId);
-                const parentRaw = item.parent;
-                const parentKey = parentRaw === 0 || parentRaw === '0' || parentRaw == null ? null : String(parentRaw);
-                const node = nodes[key];
-                if (parentKey && nodes[parentKey]) {
-                    nodes[parentKey].children.push(node);
-                } else {
-                    roots.push(node);
-                }
-            });
-            // expose node map for edit operations
-            window.__nodesMap = nodes;
-            return roots;
-        }
-
-        function renderTree(data) {
-            const tbody = document.getElementById('tableBody');
-            tbody.innerHTML = '';
-
-            // If we received a flat array with `parent` keys, convert to nested children
-            let tree = data;
-            if (Array.isArray(data) && data.length && data[0].parent !== undefined) {
-                tree = buildTree(data);
-            }
-
-            function addRow(item, depth = 0, parentKey = null) {
-                const row = document.createElement('tr');
-                row.dataset.key = String(item.key != null ? item.key : item.DT_RowId);
-                if (parentKey !== null) row.dataset.parent = String(parentKey);
-                if (depth > 0) row.classList.add('hidden');
-
-                const nameTd = document.createElement('td');
-                nameTd.style.paddingLeft = `${depth * 16}px`;
-
-                const hasChildren = item.children && item.children.length > 0;
-                if (hasChildren) {
-                    const toggle = document.createElement('span');
-                    toggle.className = 'toggle';
-                    toggle.textContent = '▶';
-                    toggle.addEventListener('click', toggleRow);
-                    nameTd.appendChild(toggle);
-                } else {
-                    const spacer = document.createElement('span');
-                    spacer.style.display = 'inline-block';
-                    spacer.style.width = '16px';
-                    nameTd.appendChild(spacer);
-                }
-
-                nameTd.appendChild(document.createTextNode(' ' + (item.name || '')));
-                const valueTd = document.createElement('td');
-                valueTd.textContent = item.value != null ? item.value : '';
-
-                row.appendChild(nameTd);
-                row.appendChild(valueTd);
-                // attach select handler (clicking row selects it)
-                row.addEventListener('click', selectRow);
-                tbody.appendChild(row);
-
-                if (hasChildren) {
-                    item.children.forEach(child => addRow(child, depth + 1, row.dataset.key));
-                }
-            }
-
-            if (Array.isArray(tree)) {
-                tree.forEach(item => addRow(item, 0, null));
-            } else if (tree) {
-                addRow(tree, 0, null);
-            }
-        }
-
-        function toggleRow(event) {
-            event.stopPropagation();
-            const toggle = event.currentTarget;
-            const tr = toggle.closest('tr');
-            const key = tr && tr.dataset && tr.dataset.key;
-            if (!key) return;
-            const opening = toggle.textContent === '▶';
-            // flip glyph
-            toggle.textContent = opening ? '▼' : '▶';
-            setVisibility(key, opening);
-        }
-
-        // Selection / Edit support
-        let selectedKey = null;
-        function selectRow(event) {
-            const tr = event.currentTarget;
-            const key = tr.dataset && tr.dataset.key;
-            if (!key) return;
-            // clear previous selection
-            document.querySelectorAll('tr.selected').forEach(r => r.classList.remove('selected'));
-            tr.classList.add('selected');
-            selectedKey = key;
-            // enable edit button
-            const editBtn = document.getElementById('editBtn');
-            if (editBtn) editBtn.disabled = false;
-        }
-
-        function openEdit() {
-            if (!selectedKey) return;
-            const node = window.__nodesMap && window.__nodesMap[selectedKey];
-            if (!node) return;
-            document.getElementById('editName').value = node.name || '';
-            document.getElementById('editValue').value = node.value != null ? node.value : '';
-            const editModalEl = document.getElementById('editModal');
-            const bsModal = new bootstrap.Modal(editModalEl);
-            bsModal.show();
-
-            // attach save handler once
-            const saveBtn = document.getElementById('saveEditBtn');
-            const saveHandler = () => {
-                const newName = document.getElementById('editName').value;
-                const newValue = document.getElementById('editValue').value;
-                saveEdit(selectedKey, newName, newValue);
-                bsModal.hide();
-                saveBtn.removeEventListener('click', saveHandler);
-            };
-            saveBtn.addEventListener('click', saveHandler);
-        }
-
-        function saveEdit(key, newName, newValue) {
-            const node = window.__nodesMap && window.__nodesMap[key];
-            if (node) {
-                node.name = newName;
-                node.value = newValue;
-            }
-            // update DOM row
-            const tr = document.querySelector(`tr[data-key="${key}"]`);
-            if (tr) {
-                const nameTd = tr.querySelector('td:first-child');
-                if (nameTd && nameTd.lastChild && nameTd.lastChild.nodeType === Node.TEXT_NODE) {
-                    nameTd.lastChild.nodeValue = ' ' + newName;
-                }
-                const valTd = tr.querySelector('td:nth-child(2)');
-                if (valTd) valTd.textContent = newValue;
-            }
-        }
-
-        function setVisibility(parentKey, show) {
-            const children = Array.from(document.querySelectorAll(`tr[data-parent="${parentKey}"]`));
-            children.forEach(child => {
-                if (show) {
-                    child.classList.remove('hidden');
-                } else {
-                    child.classList.add('hidden');
-                    // recursively hide grandchildren and reset their toggles
-                    const childKey = child.dataset.key;
-                    const nestedToggle = child.querySelector('.toggle');
-                    if (nestedToggle) nestedToggle.textContent = '▶';
-                    setVisibility(childKey, false);
-                }
-            });
-        }
-
-        function expandAll() {
-            // show all rows that have a parent
-            document.querySelectorAll('tr[data-parent]').forEach(r => r.classList.remove('hidden'));
-            // set all toggles to open
-            document.querySelectorAll('.toggle').forEach(t => t.textContent = '▼');
-        }
-
-        function collapseAll() {
-            // hide all non-root rows
-            document.querySelectorAll('tr[data-parent]').forEach(r => r.classList.add('hidden'));
-            // reset all toggles to closed
-            document.querySelectorAll('.toggle').forEach(t => t.textContent = '▶');
-        }
-
-        loadHierarchy();
-    </script>
     <!-- Popper (required for some Bootstrap hover/tooltip/popover features) -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
     <!-- Bootstrap JS (non-bundle) v5.2.3; Popper is loaded separately above -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
+    <!-- Client-side script -->
+    <script src="client-side_script.js"></script>
 </body>
 </html>

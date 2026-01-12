@@ -41,3 +41,20 @@ tr:hover {
 tr.selected {
     background-color: #e9f5ff;
 }
+.nested-cell {
+    padding-left: calc(var(--depth, 0) * 16px);
+    position: relative;
+}
+tr[data-parent] .nested-cell::before {
+    content: '';
+    position: absolute;
+    left: calc(var(--depth, 0) * 16px - 8px);
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background-color: #ccc;
+}
+.spacer {
+    display: inline-block;
+    width: 16px;
+}
