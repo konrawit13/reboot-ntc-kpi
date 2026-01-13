@@ -8,7 +8,7 @@ class HierarchyTable {
 
     async loadHierarchy() {
         try {
-            const response = await fetch('heirarchy_kpitest1.json');
+            const response = await fetch('heirarchy_kpitest2.json');
             const payload = await response.json();
             // Handle either a raw array or a wrapped object { data: [...] }
             this.nodeData = payload;
