@@ -3,6 +3,7 @@ class HierarchyTable {
         this.nodesMap = {};
         this.selectedKey = null;
         this.loadHierarchy();
+        this.nodeData = null;
     }
 
     async loadHierarchy() {
@@ -10,6 +11,7 @@ class HierarchyTable {
             const response = await fetch('heirarchy_kpitest1.json');
             const payload = await response.json();
             // Handle either a raw array or a wrapped object { data: [...] }
+            this.nodeData = payload;
             const data = Array.isArray(payload) ? payload : (payload && payload.data) ? payload.data : payload;
             this.renderTree(data);
         } catch (error) {
@@ -192,11 +194,26 @@ class HierarchyTable {
         // reset all toggles to closed
         document.querySelectorAll('.toggle').forEach(t => t.textContent = '▶');
     }
+
+    validateAggregateSum(key) {
+        const node = this.nodesMap[key];
+        if (!node || !node.children || node.children.length === 0) {
+            return true; // No children to validate, consider valid
+        }
+        const sum = node.children.reduce((acc, child) => {
+            const val = parseFloat(child.value) || 0;
+            return acc + val;
+        }, 0);
+        const parentVal = parseFloat(node.value) || 0;
+        return sum === parentVal;
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     // 1) Construct HierarchyTable
     const hierarchyTable = new HierarchyTable();
+    console.log(hierarchyTable.nodesMap);
+    console.log(hierarchyTable.validateAggregateSum(4));
 
     // 2) Build table (already done in constructor via loadHierarchy)
 
